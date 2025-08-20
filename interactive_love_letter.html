@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>For You 💌</title>
+  <style>
+    :root{
+      --bg: #fff5f7;
+      --accent: #ff5e7e;
+      --accent-dark: #e34d6c;
+      --paper: #ffffff;
+      --envelope: #ffbcc9;
+      --envelope-shadow: #ffa6b7;
+      --ink: #333;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(1200px 800px at 50% 10%, #ffe3ea 0%, var(--bg) 60%);
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--ink);
+    }
+    .wrap {
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .card {
+      position: relative;
+      width: min(520px, 92vw);
+      perspective: 1400px;
+    }
+    .envelope {
+      position: relative;
+      width: 100%;
+      background: var(--envelope);
+      border-radius: 16px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.18), 0 8px 20px rgba(0,0,0,0.12);
+      padding-top: 66%;
+      overflow: hidden;
+    }
+    .flap {
+      position: absolute;
+      inset: 0;
+      transform-origin: top;
+      background: linear-gradient(180deg, #ffc8d4 0%, var(--envelope) 40%);
+      clip-path: polygon(0 0, 100% 0, 50% 60%);
+      transition: transform .9s cubic-bezier(.2,.9,.2,1.1);
+      z-index: 3;
+    }
+    .pocket {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, transparent 58%, var(--envelope) 58%),
+        linear-gradient(180deg, var(--envelope-shadow), var(--envelope));
+      clip-path: polygon(0 58%, 100% 58%, 100% 100%, 0 100%);
+      z-index: 2;
+    }
+    .letter {
+      position: absolute;
+      left: 6%;
+      right: 6%;
+      bottom: 6%;
+      height: 84%;
+      background: var(--paper);
+      border-radius: 12px;
+      padding: 20px 18px;
+      box-shadow: 0 12px 18px rgba(0,0,0,0.10);
+      transform: translateY(40%) rotateX(12deg);
+      transform-origin: bottom;
+      transition: transform 1s cubic-bezier(.2,.9,.2,1.05) .15s;
+      overflow: auto;
+      z-index: 1;
+    }
+    .seal {
+      position: absolute;
+      top: 42%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: inset 0 -6px 0 var(--accent-dark), 0 6px 14px rgba(0,0,0,.18);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 28px;
+      z-index: 4;
+      transition: transform .45s ease, opacity .45s ease;
+    }
+    .cta {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffffffcc;
+      backdrop-filter: blur(6px);
+      border: 1px solid #ffd1db;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      z-index: 5;
+      user-select: none;
+    }
+    button.open-btn {
+      all: unset;
+      display: inline-block;
+      cursor: pointer;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      transition: transform .06s ease, box-shadow .2s ease, background .15s ease;
+      box-shadow: 0 8px 16px rgba(255,94,126,.35);
+    }
+    button.open-btn:active { transform: translateY(1px); }
+    .hint { margin-left: 10px; opacity: .8; font-size: 12px; }
+
+    /* Hearts */
+    .hearts {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 999;
+      opacity: 0;
+      transition: opacity .6s ease;
+    }
+    .heart {
+      position: absolute;
+      font-size: 18px;
+      animation: floatUp linear forwards;
+      opacity: .9;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,.15));
+      will-change: transform, opacity;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(0.9) rotate(0deg); opacity: 0; }
+      10% { opacity: .95; }
+      100% { transform: translateY(-120vh) scale(1.15) rotate(12deg); opacity: 0; }
+    }
+
+    /* Typography inside letter */
+    .letter h1 {
+      margin: 0 0 10px 0;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+    .letter p {
+      line-height: 1.6;
+      margin: 0 0 12px 0;
+      white-space: pre-wrap;
+    }
+    .sig {
+      margin-top: 14px;
+      font-style: italic;
+    }
+
+    /* Open state */
+    .card.open .flap { transform: rotateX(-170deg); }
+    .card.open .letter { transform: translateY(0) rotateX(0); }
+    .card.open .seal { transform: scale(0.8); opacity: 0; }
+
+    /* Accessibility tweak for prefers-reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      .flap, .letter, .seal { transition: none !important; }
+      .heart { animation-duration: 1s !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" id="card" role="button" aria-label="Open letter">
+      <div class="envelope">
+        <div class="flap"></div>
+        <div class="pocket"></div>
+        <div class="letter" id="letter">
+          <h1>For You</h1>
+          <p>After last night’s call, I had to type this out. I guess you could call it a love letter because honestly, if I tried to say all of this out loud, I probably would’ve bawled my eyes out. So, to prevent that, here it is in words.</p>
+
+          <p>What I love most about you is how emotionally mature you are. You always seem to know when something is off with me, even when I don’t notice it myself. With you, I never feel like I have to put on a front or always be this strong, independent girl. You make it easy for me to let my guard down, lean on you, and just be myself, and that’s something so rare.</p>
+
+          <p>You’ve become my biggest support system. You never doubt me, you always believe in me, even when I struggle to believe in myself. You’re honest, maybe a little too honest sometimes, but you never sugarcoat things. You tell me what I need to hear, when I need to hear it, and I admire you so much for that. You push me to grow, to stop being lazy, and to reach my limits. And for that, I’ll always be grateful, because you inspire me to be better every single day.</p>
+
+          <p>It means so much that you never make me feel like I’m too much or not enough. You listen, you remember the little things I say, and you somehow find ways to make even the smallest, ordinary moments feel so special. You make me laugh until my cheeks hurt, and somehow, you make me feel safe through a screen. You’re my favourite notification to get, and you always know how to balance being serious with making me laugh at exactly the right time. Around you, I never have to worry, you make it easy for me to be me</p>
+
+          <p>Even with the distance between us, you find ways to keep me fulfilled and loved endlessly. Your kisses, your fashion shows, and your rants well, not really rants, but your rants about cricket and cars, make me fall for you even more, you silly goose You’re so cute, and a little mean and bossy sometimes, but truly one of a kind…….my pineapple.</p>
+
+          <p>At the end of the day, what matters most is that being with you feels like home, no matter how far apart we may be.</p>
+
+          <p>I’m sorry if I ever made you doubt the love I have for you. Please know that it’s always there, it’s pure, genuine, and I hope you can feel it as much as I do.</p>
+          <p class="sig">💙</p>
+        </div>
+        <div class="seal" aria-hidden="true">💌</div>
+        <div class="cta">
+          <button class="open-btn" id="openBtn">Tap to open</button>
+          <span class="hint">or click anywhere</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hearts" id="hearts" aria-hidden="true"></div>
+
+  <script>
+    const card = document.getElementById('card');
+    const openBtn = document.getElementById('openBtn');
+    const hearts = document.getElementById('hearts');
+
+    const open = () => {
+      card.classList.add('open');
+      burstHearts();
+      // Allow hearts to remain visible
+      hearts.style.opacity = '1';
+      setTimeout(() => hearts.style.opacity = '0', 2000);
+    };
+
+    card.addEventListener('click', (e) => {
+      if (!card.classList.contains('open')) open();
+    });
+    openBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!card.classList.contains('open')) open();
+    });
+
+    function burstHearts() {
+      const count = 26;
+      const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+      for (let i = 0; i < count; i++) {
+        const h = document.createElement('div');
+        h.className = 'heart';
+        h.textContent = ['❤️','💗','💖','💘','💝'][Math.floor(Math.random()*5)];
+        const startX = Math.random() * vw;
+        const duration = 2000 + Math.random() * 2000;
+        const delay = Math.random() * 300;
+        const size = 14 + Math.random() * 22;
+        h.style.left = startX + 'px';
+        h.style.bottom = '-20px';
+        h.style.fontSize = size + 'px';
+        h.style.animationDuration = duration + 'ms';
+        h.style.animationDelay = delay + 'ms';
+        hearts.appendChild(h);
+        setTimeout(() => { h.remove(); }, duration + 1000);
+      }
+    }
+  </script>
+</body>
+</html>
